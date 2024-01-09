@@ -157,14 +157,20 @@
     </div>
 
     <div class="gallery-container">
-        {% for thumbnail, photo in images %}
+        {% for image in images %}
             <div class="gallery-item">
-                <a href="{% url 'send_image' photo %}" target="_blank">
-                    <img src="{% url 'send_image' thumbnail %}" alt="Thumbnail">
+                <a href="{% url 'send_image' image.photo %}" target="_blank">
+                    <img src="{% url 'send_image' image.thumbnail %}" alt="Thumbnail">
                 </a>
-                <button type="button" class="button" id="photo{{ forloop.counter }}" onclick="updateTags('{{photo}}')">Add Tags</button>
+                <button type="button" class="button" id="photo{{ forloop.counter }}" onclick="updateTags('{{ image.photo }}')">Add Tags</button>
+                <div class="tags">
+                    {% for tag in image.tags %}
+                        <span>{{ tag.name }}, </span>
+                    {% endfor %}
+                </div>
             </div>
         {% endfor %}
     </div>
+    
 </body>
 </html>

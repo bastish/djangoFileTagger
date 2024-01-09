@@ -1,20 +1,10 @@
 # views.py
-from django.shortcuts import render, redirect
-from .models import AccessibleDirectory
-from .forms import DirectoryForm
 import os
-from django.shortcuts import get_object_or_404, render
-from .models import AccessibleDirectory
-from django.conf import settings
-from django.shortcuts import render
-import os
-import os
-from django.shortcuts import render, get_object_or_404
-from .models import AccessibleDirectory
+from django.shortcuts import render, redirect, get_object_or_404
 from django.http import FileResponse, Http404
-import os
-from django.shortcuts import render, get_object_or_404
-from .models import AccessibleDirectory, Tag, TagGroup
+from .models import AccessibleDirectory, Tag, TagGroup, File
+from .forms import DirectoryForm
+
 
 
 def directory_list(request):
@@ -42,25 +32,35 @@ def directory_detail(request, dir_id):
 
 def gallery_view(request, dir_id, dir_name):
     directory = get_object_or_404(AccessibleDirectory, id=dir_id)
-    gallery_path = directory.path  # This is the full path of the chosen directory
+    gallery_path = directory.path
     tags = Tag.objects.all()
     tag_groups = TagGroup.objects.all()
-    print(tag_groups)
+
     thumbnails_path = os.path.join(gallery_path, dir_name, 'images/thumbnails')
     photos_path = os.path.join(gallery_path, dir_name, 'images')
-    # Check if the paths exist and create lists of thumbnail and photo paths
-    if os.path.exists(thumbnails_path) and os.path.exists(photos_path):
-        thumbnails = [os.path.join(thumbnails_path, name) for name in os.listdir(thumbnails_path) if name.endswith('.jpg')]
-        photos = [os.path.join(photos_path, name) for name in os.listdir(photos_path) if name.endswith('.jpg')]
-    else:
-        thumbnails = []
-        photos = []
 
-    images = zip(thumbnails, photos)
-    
+    image_data = []
+
+    if os.path.exists(thumbnails_path) and os.path.exists(photos_path):
+        thumbnail_files = [name for name in os.listdir(thumbnails_path) if name.endswith('.jpg')]
+        photo_files = [name for name in os.listdir(photos_path) if name.endswith('.jpg')]
+
+        for thumbnail, photo in zip(thumbnail_files, photo_files):
+            photo_full_path = os.path.join(photos_path, photo)
+            file_instance = File.objects.filter(path=photo_full_path).first()
+            file_tags = file_instance.tags.all() if file_instance else []
+
+            image_data.append({
+                'thumbnail': os.path.join(thumbnails_path, thumbnail),
+                'photo': photo_full_path,
+                'tags': file_tags
+            })
+    else:
+        image_data = []
+
     return render(request, 'gallery.html', {
-        'gallery_name': gallery_path, 
-        'images': images,
+        'gallery_name': gallery_path,
+        'images': image_data,
         'tag_groups': tag_groups,
         'tags': tags
     })
@@ -73,3 +73,4 @@ def send_image(request, filename):
         return FileResponse(open(image_path, 'rb'))
     else:
         raise Http404("Image does not exist")
+

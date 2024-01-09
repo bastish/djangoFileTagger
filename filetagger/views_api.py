@@ -1,9 +1,9 @@
-import json
-import os
 from django.http import JsonResponse
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 from .models import File, Tag
+import json
+import os
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -52,3 +52,5 @@ def create_tags(request):
         return JsonResponse({'new_tags': new_tags})
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
+
