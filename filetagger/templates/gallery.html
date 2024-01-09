@@ -50,10 +50,10 @@
     </style>
 
     <script>
-        
-        function updateTags(photo) {
-            const tagIds = Array.from(document.querySelectorAll('.available-tags input:checked')).map(input => input.id);
-            const action = document.querySelector('input[name="addorremove"]:checked').value;
+        function updateTags(photo, tagIds, action) {
+            
+            tagIds = tagIds || Array.from(document.querySelectorAll('.available-tags input:checked')).map(input => input.id);
+            action = action || document.querySelector('input[name="addorremove"]:checked').value;
 
             fetch('/api/update-file-tags/', {
                 method: 'POST',
@@ -69,12 +69,26 @@
             .then(response => response.json())
             .then(data => {
                 console.log(data);
+                // Optionally, update the UI to reflect the tag removal
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         }
         
+        
+        
+        function removeTag(tagName, photoId) {
+            // Find the tag ID based on the tag name
+            const tag = Array.from(document.querySelectorAll('.available-tags input'))
+                            .find(input => input.name === tagName);
+        
+            if (tag) {
+                updateTags(photoId, [tag.id], 'remove');
+            } else {
+                console.error('Tag not found:', tagName);
+            }
+        }
 
         function selectTagGroupTags(tagGroupIds) {
             // tagGroupIds should be a string of tag ids separated by commas (e.g. "1,2,3")
@@ -126,7 +140,6 @@
             });
         }
         
-        
     </script>
 </head>
 <body>
@@ -165,7 +178,7 @@
                 <button type="button" class="button" id="photo{{ forloop.counter }}" onclick="updateTags('{{ image.photo }}')">Add Tags</button>
                 <div class="tags">
                     {% for tag in image.tags %}
-                        <span>{{ tag.name }}, </span>
+                        <button onclick="removeTag('{{ tag.name }}', '{{ image.photo }}')">{{ tag.name }}</button>
                     {% endfor %}
                 </div>
             </div>

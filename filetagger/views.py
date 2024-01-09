@@ -49,10 +49,12 @@ def gallery_view(request, dir_id, dir_name):
             photo_full_path = os.path.join(photos_path, photo)
             file_instance = File.objects.filter(path=photo_full_path).first()
             file_tags = file_instance.tags.all() if file_instance else []
+            file_id = file_instance.id if file_instance else ''
 
             image_data.append({
                 'thumbnail': os.path.join(thumbnails_path, thumbnail),
                 'photo': photo_full_path,
+                'id': file_id,
                 'tags': file_tags
             })
     else:
