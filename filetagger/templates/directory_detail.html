@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Directory Contents</title>
+</head>
+<body>
+    <h2>Contents of {{ directory.path }}</h2>
+    <ul>
+        {% for item in contents %}
+            <li>
+                {% if item.is_dir %}
+                    {{directory.path}}/{{item.name}}/images/thumbnails/<br>
+                    <a href="{% url 'gallery_view' directory.id item.name %}">{{ item.name }}</a>
+                {% else %}
+                    {{ item.name }}
+                {% endif %}
+            </li>
+        {% endfor %}
+    </ul>
+    
+    
+    
+</body>
+</html>

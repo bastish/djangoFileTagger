@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Directory List</title>
+</head>
+<body>
+    <h2>Directory List</h2>
+    <ul>
+        {% for directory in directories %}
+            <li><a href="{% url 'directory_detail' directory.id %}">{{ directory.path }}</a></li>
+        {% endfor %}
+    </ul>
+    
+    <h3>Add New Directory</h3>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit">Add</button>
+    </form>
+</body>
+</html>

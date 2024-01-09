@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ gallery_name }}</title>
+    <style>
+        .fixed-tags-container {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: white;
+            padding: 10px;
+            box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+        }
+
+        .gallery-container {
+            padding-top: 150px; /* Adjust based on the height of the fixed tags container */
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            /* ... other styles for your gallery container ... */
+        }
+        .gallery-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px; /* Adjust the space between items */
+        }
+
+        .gallery-item {
+            flex-basis: calc(25% - 10px); /* Adjust number for desired width, subtracting the gap */
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .gallery-item img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 4px; /* Optional: for rounded corners */
+        }
+
+        .gallery-item input[type=checkbox] {
+            transform: scale(1.5); /* Makes the checkbox larger */
+            margin-top: 5px;
+        }
+        .button {
+            padding: 5px;
+            margin: 5px;
+        }
+    </style>
+
+    <script>
+        
+        function updateTags(photo) {
+            const tagIds = Array.from(document.querySelectorAll('.available-tags input:checked')).map(input => input.id);
+            const action = document.querySelector('input[name="addorremove"]:checked').value;
+
+            fetch('/api/update-file-tags/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                    photo: photo,
+                    tags: tagIds,
+                    action: action
+                }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        
+
+        function selectTagGroupTags(tagGroupIds) {
+            // tagGroupIds should be a string of tag ids separated by commas (e.g. "1,2,3")
+            // This function would check or uncheck all checkboxes with the specified ids
+            tagGroupIds.split(',').forEach(id => {
+                let checkbox = document.getElementById(id);
+                if (checkbox) {
+                    checkbox.checked = !checkbox.checked; // Toggle the checkbox
+                }
+            });
+        }
+
+        function addNewTags() {
+            const newTagsValue = document.getElementById('newTags').value;
+            const newTagsArray = newTagsValue.split(',').map(tag => tag.trim()); // Split by comma and trim spaces
+        
+            fetch('/api/create-tags/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ tags: newTagsArray }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.new_tags) {
+                    updateAvailableTags(data.new_tags);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        
+        function updateAvailableTags(newTags) {
+            const availableTagsDiv = document.querySelector('.available-tags');
+            newTags.forEach(tag => {
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.id = tag.id;
+                checkbox.name = tag.slug;
+        
+                const label = document.createElement('label');
+                label.htmlFor = tag.id;
+                label.textContent = tag.name;
+        
+                availableTagsDiv.appendChild(checkbox);
+                availableTagsDiv.appendChild(label);
+            });
+        }
+        
+        
+    </script>
+</head>
+<body>
+    <div class="fixed-tags-container">
+        <b>Gallery: {{ gallery_name }}</b>
+        <div class="tags">
+            <div class="tags">
+                <label for="add">Add:</label>
+                <input type="radio" id="add" name="addorremove" value="add" checked>
+                <label for="remove">Remove:</label>
+                <input type="radio" id="remove" name="addorremove" value="remove">
+                <input type="text" name="newTags" id="newTags" size="100" placeholder="comma delimited tags">
+                <button type="button" onclick="addNewTags()">Add</button>
+            </div>
+            
+            <div class="available-tags">
+                {% for tag in tags %}
+                <input type="checkbox" id="{{ tag.id }}" name="{{ tag.slug }}"> {{tag.name}}
+                {% endfor %}
+            </div>
+            <h4>Tag Groups</h4>
+            <div class="available-tagGroups">
+                {% for tag_group in tag_groups %}
+                <input type="checkbox" id="{{ tag_group.id }}" name="{{ tag_group.id }}" onclick="selectTagGroupTags('1,2,3,4')"> {{tag_group.name}}
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+
+    <div class="gallery-container">
+        {% for thumbnail, photo in images %}
+            <div class="gallery-item">
+                <a href="{% url 'send_image' photo %}" target="_blank">
+                    <img src="{% url 'send_image' thumbnail %}" alt="Thumbnail">
+                </a>
+                <button type="button" class="button" id="photo{{ forloop.counter }}" onclick="updateTags('{{photo}}')">Add Tags</button>
+            </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
