@@ -2,7 +2,7 @@ from django.contrib import admin
 
 # Register your models here.
 from django.contrib import admin
-from .models import File, Tag, TagGroup
+from .models import AccessibleDirectory,File, Tag, TagGroup
 
 @admin.register(File)
 class FileAdmin(admin.ModelAdmin):
@@ -19,3 +19,8 @@ class TagAdmin(admin.ModelAdmin):
 class TagGroupAdmin(admin.ModelAdmin):
     list_display = ('name',)
     filter_horizontal = ('tags',)
+
+
+@admin.register(AccessibleDirectory)
+class AccessibleDirectoryAdmin(admin.ModelAdmin):
+    list_display = ('path',)

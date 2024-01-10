@@ -70,13 +70,44 @@
             .then(data => {
                 console.log(data);
                 // Optionally, update the UI to reflect the tag removal
+                if (data.status === 'success') {
+                    // Update the UI to reflect the tag addition or removal
+                    updatePhotoTagsUI(photo, data.updatedTags, action);
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         }
         
-        
+
+
+        function updatePhotoTagsUI(photo) {
+            fetch(`/api/get-photo-tags/?photo=${encodeURIComponent(photo)}`)
+            .then(response => response.json())
+            .then(data => {
+                const photoElement = document.querySelector(`[data-photo='${photo}']`);
+                if (photoElement) {
+                    const tagsContainer = photoElement.querySelector('.tags');
+                    if (tagsContainer) {
+                        // Clear existing tags
+                        tagsContainer.innerHTML = '';
+
+                        // Add each tag as a button
+                        data.tags.forEach(tag => {
+                            const tagButton = document.createElement('button');
+                            tagButton.textContent = tag.name;
+                            tagButton.onclick = () => removeTag(tag.name, photo);
+                            tagsContainer.appendChild(tagButton);
+                        });
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+
         
         function removeTag(tagName, photoId) {
             // Find the tag ID based on the tag name
@@ -171,7 +202,7 @@
 
     <div class="gallery-container">
         {% for image in images %}
-            <div class="gallery-item">
+            <div class="gallery-item" data-photo="{{ image.photo }}">
                 <a href="{% url 'send_image' image.photo %}" target="_blank">
                     <img src="{% url 'send_image' image.thumbnail %}" alt="Thumbnail">
                 </a>

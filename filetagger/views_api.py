@@ -24,14 +24,19 @@ def update_file_tags(request):
 
         tags = Tag.objects.filter(id__in=tag_ids)
 
+        
         if action == 'add':
             file.tags.add(*tags)
-            message = "Tags added successfully"
         elif action == 'remove':
             file.tags.remove(*tags)
-            message = "Tags removed successfully"
 
-        return JsonResponse({"status": "success", "message": message})
+        updated_tags = list(file.tags.values('id', 'name'))
+
+        return JsonResponse({
+            "status": "success", 
+            "message": f"Tags {action}ed successfully",
+            "updatedTags": updated_tags
+        })
     except Exception as e:
         return JsonResponse({"status": "error", "message": str(e)}, status=400)
 
@@ -54,3 +59,13 @@ def create_tags(request):
         return JsonResponse({"status": "error", "message": str(e)}, status=400)
 
 
+
+@require_http_methods(["GET"])
+def get_photo_tags(request):
+    photo_path = request.GET.get('photo')
+    try:
+        file = File.objects.get(path=photo_path)
+        tags = list(file.tags.values('id', 'name'))
+        return JsonResponse({'tags': tags})
+    except File.DoesNotExist:
+        return JsonResponse({'tags': []})
