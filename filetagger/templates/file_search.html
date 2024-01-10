@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Tag-Based File Search</title>
+    <!-- Add CSS and JS as needed -->
+
+    <script>
+        function moveToSearchBox(tagId, tagName) {
+            // Implement logic to move tags to the search box
+        }
+        
+        function performSearch() {
+            const searchTagIds = Array.from(document.querySelectorAll('.search-tags button'))
+                                     .map(button => button.getAttribute('data-tag-id'));
+        
+            fetch(`/api/search-files/?tag_ids=${searchTagIds.join(',')}`)
+            .then(response => response.json())
+            .then(data => {
+                // Populate .search-results div with file results
+                const resultsDiv = document.querySelector('.search-results');
+                resultsDiv.innerHTML = '';  // Clear previous results
+                data.files.forEach(file => {
+                    const fileDiv = document.createElement('div');
+                    fileDiv.textContent = file.name;  // Adjust based on how you want to display files
+                    resultsDiv.appendChild(fileDiv);
+                });
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+        
+    </script>
+</head>
+<body>
+    <div class="tag-search">
+        <div class="available-tags">
+            <h2>Available Tags</h2>
+            {% for tag in tags %}
+                <button onclick="moveToSearchBox('{{ tag.id }}', '{{ tag.name }}')">{{ tag.name }}</button>
+            {% endfor %}
+        </div>
+
+        <div class="search-tags">
+            <h2>Search By Tags</h2>
+            <!-- Selected tags for search will appear here -->
+        </div>
+
+        <button onclick="performSearch()">Search Files</button>
+    </div>
+
+    <div class="search-results">
+        <!-- Search results will appear here -->
+    </div>
+
+    <script>
+        // JavaScript functions will go here
+    </script>
+</body>
+</html>

@@ -6,9 +6,13 @@ from .models import AccessibleDirectory,File, Tag, TagGroup
 
 @admin.register(File)
 class FileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'path')  
+    list_display = ('name', 'path', 'display_tags')  
     search_fields = ('name', 'path')
     filter_horizontal = ('tags',)
+
+    def display_tags(self, obj):
+        return ", ".join([tag.name for tag in obj.tags.all()])
+    
 
 @admin.register(Tag)
 class TagAdmin(admin.ModelAdmin):

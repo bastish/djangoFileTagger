@@ -11,50 +11,104 @@
             background-color: white;
             padding: 10px;
             box-shadow: 0px 4px 8px rgba(0,0,0,0.1);
+            display: flex;
+            flex-direction: column; /* Organize child elements in a column */
+            align-items: flex-start;
+            z-index: 100; /* To ensure it stays on top */
         }
+    
+        .tags-controls {
+            width: 100%; /* Full width */
+            display: flex;
+            gap: 10px;
+        }
+    
+        .tags-container {
+            display: flex; /* Flex layout for tag containers */
+            width: 100%; /* Full width */
+            margin-top: 10px; /* Space below the controls */
+        }
+    
+        .available-tags {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: auto; /* For overflow handling */
+        }
+    
+        .selected-tags {
+            padding: 5px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            overflow: auto; /* For overflow handling */
+        }
+    
+        .available-tags-container {
+            width: 50%;
+        }
+        .selected-tags-container {
+            width: 50%;
+        }
+    
 
         .gallery-container {
-            padding-top: 150px; /* Adjust based on the height of the fixed tags container */
+            padding-top: 200px; /* Adjust the padding to accommodate the fixed container */
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
-            /* ... other styles for your gallery container ... */
         }
-        .gallery-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 10px; /* Adjust the space between items */
-        }
-
+    
         .gallery-item {
-            flex-basis: calc(25% - 10px); /* Adjust number for desired width, subtracting the gap */
+            flex-basis: calc(25% - 10px); /* Adjust for desired width, subtracting the gap */
             display: flex;
             flex-direction: column;
             align-items: center;
         }
-
+    
         .gallery-item img {
             max-width: 100%;
             height: auto;
-            border-radius: 4px; /* Optional: for rounded corners */
+            border-radius: 4px;
         }
-
-        .gallery-item input[type=checkbox] {
-            transform: scale(1.5); /* Makes the checkbox larger */
-            margin-top: 5px;
-        }
-        .button {
+    
+        /* Styles for buttons and inputs */
+        .button, input[type='text'] {
             padding: 5px;
             margin: 5px;
         }
     </style>
+    
 
     <script>
-        function updateTags(photo, tagIds, action) {
-            
-            tagIds = tagIds || Array.from(document.querySelectorAll('.available-tags input:checked')).map(input => input.id);
-            action = action || document.querySelector('input[name="addorremove"]:checked').value;
+        
 
+        
+        function removeTag(tagName, photo) {
+            // Search in both available-tags and selected-tags divs
+            const tagButton = Array.from(document.querySelectorAll('.available-tags button, .selected-tags button'))
+                                   .find(button => button.textContent === tagName);
+        
+            if (tagButton) {
+                const tagId = tagButton.getAttribute('data-tag-id');
+                updateTags(photo, [tagId], 'remove');
+            } else {
+                console.error('Tag not found:', tagName);
+            }
+        }
+        
+        
+        function updateTags(photo, tagIds, action) {
+            // If tagIds is not provided, fetch from the selected-tags div
+            if (!tagIds) {
+                const selectedTagButtons = document.querySelectorAll('.selected-tags button');
+                tagIds = Array.from(selectedTagButtons).map(button => button.getAttribute('data-tag-id'));
+            }
+        
+            // If action is not provided, default to 'add'
+            action = action || 'add';
+            console.log('tagIds', tagIds);
+            console.log('action', action);
+            
             fetch('/api/update-file-tags/', {
                 method: 'POST',
                 headers: {
@@ -69,7 +123,7 @@
             .then(response => response.json())
             .then(data => {
                 console.log(data);
-                // Optionally, update the UI to reflect the tag removal
+                // Optionally, update the UI to reflect the tag changes
                 if (data.status === 'success') {
                     // Update the UI to reflect the tag addition or removal
                     updatePhotoTagsUI(photo, data.updatedTags, action);
@@ -80,8 +134,7 @@
             });
         }
         
-
-
+        
         function updatePhotoTagsUI(photo) {
             fetch(`/api/get-photo-tags/?photo=${encodeURIComponent(photo)}`)
             .then(response => response.json())
@@ -108,18 +161,6 @@
             });
         }
 
-        
-        function removeTag(tagName, photoId) {
-            // Find the tag ID based on the tag name
-            const tag = Array.from(document.querySelectorAll('.available-tags input'))
-                            .find(input => input.name === tagName);
-        
-            if (tag) {
-                updateTags(photoId, [tag.id], 'remove');
-            } else {
-                console.error('Tag not found:', tagName);
-            }
-        }
 
         function selectTagGroupTags(tagGroupIds) {
             // tagGroupIds should be a string of tag ids separated by commas (e.g. "1,2,3")
@@ -157,48 +198,59 @@
         function updateAvailableTags(newTags) {
             const availableTagsDiv = document.querySelector('.available-tags');
             newTags.forEach(tag => {
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.id = tag.id;
-                checkbox.name = tag.slug;
-        
-                const label = document.createElement('label');
-                label.htmlFor = tag.id;
-                label.textContent = tag.name;
-        
-                availableTagsDiv.appendChild(checkbox);
-                availableTagsDiv.appendChild(label);
+                const tagButton = document.createElement('button');
+                tagButton.textContent = tag.name;
+                tagButton.id = `tag-${tag.id}`; // Prefixed with 'tag-' to ensure unique IDs
+                tagButton.setAttribute('data-tag-id', tag.id);
+                tagButton.onclick = function() { moveTagToSelected(tag.id, tag.name); };
+                availableTagsDiv.appendChild(tagButton);
             });
         }
+        
+        function moveTagToSelected(tagId, tagName) {
+            let tagButton = document.getElementById(`tag-${tagId}`);
+        
+            if (tagButton.parentNode && tagButton.parentNode.classList.contains('available-tags')) {
+                document.querySelector('.selected-tags').appendChild(tagButton);
+            } else {
+                document.querySelector('.available-tags').appendChild(tagButton);
+            }
+        }
+        
+        
+        
         
     </script>
 </head>
 <body>
+    <b>Gallery: {{ gallery_name }}</b>
     <div class="fixed-tags-container">
-        <b>Gallery: {{ gallery_name }}</b>
-        <div class="tags">
-            <div class="tags">
-                <label for="add">Add:</label>
-                <input type="radio" id="add" name="addorremove" value="add" checked>
-                <label for="remove">Remove:</label>
-                <input type="radio" id="remove" name="addorremove" value="remove">
-                <input type="text" name="newTags" id="newTags" size="100" placeholder="comma delimited tags">
-                <button type="button" onclick="addNewTags()">Add</button>
+        <div class="tags-controls">
+            <input type="text" name="newTags" id="newTags" size="100" placeholder="comma delimited tags">
+            <button type="button" onclick="addNewTags()">Add</button>
+            <button type="button" onclick="performSearch()">Search Files</button>
+        </div>
+    
+        <div class="tags-container">
+            <div class="available-tags-container">
+                <b>Available Tags</b>
+                <div class="available-tags">
+                    {% for tag in tags %}
+                        <button type="button" id="tag-{{ tag.id }}" data-tag-id="{{ tag.id }}" onclick="moveTagToSelected('{{ tag.id }}', '{{ tag.name }}')">{{ tag.name }}</button>
+                    {% endfor %}
+                </div>
             </div>
-            
-            <div class="available-tags">
-                {% for tag in tags %}
-                <input type="checkbox" id="{{ tag.id }}" name="{{ tag.slug }}"> {{tag.name}}
-                {% endfor %}
-            </div>
-            <h4>Tag Groups</h4>
-            <div class="available-tagGroups">
-                {% for tag_group in tag_groups %}
-                <input type="checkbox" id="{{ tag_group.id }}" name="{{ tag_group.id }}" onclick="selectTagGroupTags('1,2,3,4')"> {{tag_group.name}}
-                {% endfor %}
+    
+            <div class="selected-tags-container">
+                <b>Selected Tags</b>
+                <div class="selected-tags">
+                    <!-- Tags selected for search will appear here -->
+                </div>
             </div>
         </div>
     </div>
+    
+    
 
     <div class="gallery-container">
         {% for image in images %}
