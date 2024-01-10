@@ -280,23 +280,14 @@
             </div>
         </div>
     </div>
-    
-    
+        
 
     <div class="gallery-container">
-        {% for image in images %}
-            <div class="gallery-item" data-photo="{{ image.photo }}">
-                <a href="{% url 'send_image' image.photo %}" target="_blank">
-                    <img src="{% url 'send_image' image.thumbnail %}" alt="Thumbnail">
-                </a>
-                <button type="button" class="button" id="photo{{ forloop.counter }}" onclick="updateTags('{{ image.photo }}')">Add Tags</button>
-                <div class="tags">
-                    {% for tag in image.tags %}
-                        <button onclick="removeTag('{{ tag.name }}', '{{ image.photo }}')">{{ tag.name }}</button>
-                    {% endfor %}
-                </div>
-            </div>
-        {% endfor %}
+
+         {% for file in files %}
+            {% include 'gallery_item.html' with file=file %}
+        {% endfor %} 
+
     </div>
     
 </body>

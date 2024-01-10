@@ -1,7 +1,7 @@
 <!-- gallery_item.html -->
 <div class="gallery-item" data-photo="{{ file.path }}">
     <a href="{% url 'send_image' file.path %}" target="_blank">
-        <img src="{% url 'send_image' file.path %}" alt="Thumbnail">
+        <img src="{% url 'send_image' file.thumbnail %}" alt="Thumbnail">
     </a>
     <button type="button" class="button" onclick="updateTags('{{ file.path }}')">Add Tags</button>
     <div class="tags">
@@ -10,3 +10,15 @@
         {% endfor %}
     </div>
 </div>
+{% comment %} 
+<div class="gallery-item" data-photo="{{ image.photo }}">
+    <a href="{% url 'send_image' image.photo %}" target="_blank">
+        <img src="{% url 'send_image' image.thumbnail %}" alt="Thumbnail">
+    </a>
+    <button type="button" class="button" id="photo{{ forloop.counter }}" onclick="updateTags('{{ image.photo }}')">Add Tags</button>
+    <div class="tags">
+        {% for tag in image.tags %}
+            <button onclick="removeTag('{{ tag.name }}', '{{ image.photo }}')">{{ tag.name }}</button>
+        {% endfor %}
+    </div>
+</div> {% endcomment %}

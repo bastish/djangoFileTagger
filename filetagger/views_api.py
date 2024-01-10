@@ -72,21 +72,17 @@ def get_photo_tags(request):
         return JsonResponse({'tags': []})
     
 
-def search_by_tags(request):
-    tag_ids = request.GET.get('tag_ids', '').split(',')
-    files = File.objects.filter(tags__id__in=tag_ids).distinct() if tag_ids else File.objects.none()
-    
-    image_data = [{'thumbnail': file.path, 'photo': file.path, 'id': file.id} for file in files]
-    return JsonResponse({'images': image_data})
-
-
-def gallery_item_html(request, file_id):
-    file_instance = File.objects.get(id=file_id)
-    return render(request, 'gallery_item.html', {'file': file_instance})
 
 def search_by_tags_html(request):
     tag_ids = request.GET.get('tag_ids', '').split(',')
     files = File.objects.filter(tags__id__in=tag_ids).distinct() if tag_ids else File.objects.none()
 
-    return render(request, 'gallery_items.html', {'files': files})
+    file_data = []
+    for file_instance in files:
+        # thumbnail path needs to mirror the photo path with an added 'thumbnails' directory
+        thumbnail_path = file_instance.path.replace('/images/', '/images/thumbnails/')
+        file_instance.thumbnail = thumbnail_path if os.path.exists(thumbnail_path) else file_instance.path
 
+        file_data.append(file_instance)
+
+    return render(request, 'gallery_items.html', {'files': file_data})

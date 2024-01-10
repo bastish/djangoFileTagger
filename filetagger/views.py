@@ -21,15 +21,13 @@ def directory_list(request):
 
 def directory_detail(request, dir_id):
     directory = get_object_or_404(AccessibleDirectory, id=dir_id)
-    # Inside the directory_detail view
-    # ...
+
     if os.path.isdir(directory.path):
         contents = [{'name': item, 'is_dir': os.path.isdir(os.path.join(directory.path, item))}
                     for item in os.listdir(directory.path)]
     else:
         contents = [{'name': 'Invalid directory', 'is_dir': False}]
     return render(request, 'directory_detail.html', {'directory': directory, 'contents': contents})
-
 
 def gallery_view(request, dir_id, dir_name):
     directory = get_object_or_404(AccessibleDirectory, id=dir_id)
@@ -38,35 +36,35 @@ def gallery_view(request, dir_id, dir_name):
     tag_groups = TagGroup.objects.all()
 
     thumbnails_path = os.path.join(gallery_path, dir_name, 'images/thumbnails')
-    photos_path = os.path.join(gallery_path, dir_name, 'images')
+    files_path = os.path.join(gallery_path, dir_name, 'images')
 
-    image_data = []
+    file_data = []
 
-    if os.path.exists(thumbnails_path) and os.path.exists(photos_path):
-        thumbnail_files = [name for name in os.listdir(thumbnails_path) if name.endswith('.jpg')]
-        photo_files = [name for name in os.listdir(photos_path) if name.endswith('.jpg')]
+    if os.path.exists(files_path):
+        files = [name for name in os.listdir(files_path) if name.endswith('.jpg')]
 
-        for thumbnail, photo in zip(thumbnail_files, photo_files):
-            photo_full_path = os.path.join(photos_path, photo)
-            file_instance = File.objects.filter(path=photo_full_path).first()
-            file_tags = file_instance.tags.all() if file_instance else []
-            file_id = file_instance.id if file_instance else ''
+        for file in files:
+            file_full_path = os.path.join(files_path, file)
+            thumbnail_file = file  # assuming thumbnail file has the same name
+            thumbnail_path = os.path.join(thumbnails_path, thumbnail_file)
 
-            image_data.append({
-                'thumbnail': os.path.join(thumbnails_path, thumbnail),
-                'photo': photo_full_path,
-                'id': file_id,
-                'tags': file_tags
-            })
-    else:
-        image_data = []
+            # Check if the thumbnail exists; if not, use the original file path
+            if not os.path.exists(thumbnail_path):
+                thumbnail_path = file_full_path
+
+            file_info = {
+                'path': file_full_path,
+                'thumbnail': thumbnail_path,
+            }
+            file_data.append(file_info)
 
     return render(request, 'gallery.html', {
         'gallery_name': gallery_path,
-        'images': image_data,
+        'files': file_data,
         'tag_groups': tag_groups,
         'tags': tags
     })
+
 
 
 def send_image(request, filename):
