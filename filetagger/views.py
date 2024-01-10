@@ -49,12 +49,16 @@ def gallery_view(request, dir_id, dir_name):
             thumbnail_path = os.path.join(thumbnails_path, thumbnail_file)
 
             # Check if the thumbnail exists; if not, use the original file path
-            if not os.path.exists(thumbnail_path):
-                thumbnail_path = file_full_path
+            thumbnail_path = thumbnail_path if os.path.exists(thumbnail_path) else file_full_path
+
+            # Check if there's a corresponding File instance in the database
+            file_instance = File.objects.filter(path=file_full_path).first()
+            file_tags = file_instance.tags.all() if file_instance else []
 
             file_info = {
                 'path': file_full_path,
                 'thumbnail': thumbnail_path,
+                'tags': file_tags
             }
             file_data.append(file_info)
 
