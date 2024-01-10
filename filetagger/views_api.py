@@ -4,6 +4,7 @@ from django.views.decorators.csrf import csrf_exempt
 from .models import File, Tag
 import json
 import os
+from django.shortcuts import render
 
 @csrf_exempt
 @require_http_methods(["POST"])
@@ -69,3 +70,23 @@ def get_photo_tags(request):
         return JsonResponse({'tags': tags})
     except File.DoesNotExist:
         return JsonResponse({'tags': []})
+    
+
+def search_by_tags(request):
+    tag_ids = request.GET.get('tag_ids', '').split(',')
+    files = File.objects.filter(tags__id__in=tag_ids).distinct() if tag_ids else File.objects.none()
+    
+    image_data = [{'thumbnail': file.path, 'photo': file.path, 'id': file.id} for file in files]
+    return JsonResponse({'images': image_data})
+
+
+def gallery_item_html(request, file_id):
+    file_instance = File.objects.get(id=file_id)
+    return render(request, 'gallery_item.html', {'file': file_instance})
+
+def search_by_tags_html(request):
+    tag_ids = request.GET.get('tag_ids', '').split(',')
+    files = File.objects.filter(tags__id__in=tag_ids).distinct() if tag_ids else File.objects.none()
+
+    return render(request, 'gallery_items.html', {'files': files})
+

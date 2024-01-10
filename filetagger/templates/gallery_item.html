@@ -1,0 +1,12 @@
+<!-- gallery_item.html -->
+<div class="gallery-item" data-photo="{{ file.path }}">
+    <a href="{% url 'send_image' file.path %}" target="_blank">
+        <img src="{% url 'send_image' file.path %}" alt="Thumbnail">
+    </a>
+    <button type="button" class="button" onclick="updateTags('{{ file.path }}')">Add Tags</button>
+    <div class="tags">
+        {% for tag in file.tags.all %}
+            <button onclick="removeTag('{{ tag.name }}', '{{ file.path }}')">{{ tag.name }}</button>
+        {% endfor %}
+    </div>
+</div>

@@ -217,7 +217,38 @@
             }
         }
         
+        function updateGallery(images) {
+            const galleryContainer = document.querySelector('.gallery-container');
+            galleryContainer.innerHTML = ''; // Clear existing content
         
+            images.forEach(image => {
+                // Extract the relative path from the full path
+                const relativePath = image.thumbnail.replace('/Volumes/Toshiba 1TB 2022.12.06/flickrBrowser/', '');
+        
+                // Construct the URL for the send_image view
+                const imageUrl = `/image/${encodeURIComponent(relativePath)}/`;
+        
+                // Create img element and append to galleryContainer
+                const imgElement = document.createElement('img');
+                imgElement.src = imageUrl;
+                imgElement.alt = 'Thumbnail';
+                galleryContainer.appendChild(imgElement);
+            });
+        }
+        
+        
+        function performSearch() {
+            const selectedTagIds = Array.from(document.querySelectorAll('.selected-tags button'))
+                                        .map(button => button.getAttribute('data-tag-id'));
+        
+            fetch(`/api/search-by-tags-html/?tag_ids=${selectedTagIds.join(',')}`)
+                .then(response => response.text())
+                .then(html => {
+                    const galleryContainer = document.querySelector('.gallery-container');
+                    galleryContainer.innerHTML = html; // Insert the HTML into the gallery container
+                })
+                .catch(error => console.error('Error:', error));
+        }
         
         
     </script>

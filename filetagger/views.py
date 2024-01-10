@@ -77,14 +77,3 @@ def send_image(request, filename):
     else:
         raise Http404("Image does not exist")
 
-
-
-def search_files(request):
-    tag_ids = request.GET.get('tag_ids', '').split(',')
-    if tag_ids:
-        files = File.objects.filter(tags__id__in=tag_ids).distinct()
-    else:
-        files = File.objects.none()
-
-    file_data = [{'id': file.id, 'name': file.name, 'path': file.path} for file in files]
-    return JsonResponse({'files': file_data})
