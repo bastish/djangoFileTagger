@@ -6,19 +6,7 @@
     <button type="button" class="button" onclick="updateTags('{{ file.path }}')">Add Tags</button>
     <div class="tags">
         {% for tag in file.tags.all %}
-            <button onclick="removeTag('{{ tag.name }}', '{{ file.path }}')">{{ tag.name }}</button>
+            <button class="tag-button" onclick="removeTag('{{ tag.name }}', '{{ file.path }}')">{{ tag.name }}</button>
         {% endfor %}
     </div>
 </div>
-{% comment %} 
-<div class="gallery-item" data-photo="{{ image.photo }}">
-    <a href="{% url 'send_image' image.photo %}" target="_blank">
-        <img src="{% url 'send_image' image.thumbnail %}" alt="Thumbnail">
-    </a>
-    <button type="button" class="button" id="photo{{ forloop.counter }}" onclick="updateTags('{{ image.photo }}')">Add Tags</button>
-    <div class="tags">
-        {% for tag in image.tags %}
-            <button onclick="removeTag('{{ tag.name }}', '{{ image.photo }}')">{{ tag.name }}</button>
-        {% endfor %}
-    </div>
-</div> {% endcomment %}

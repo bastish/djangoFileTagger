@@ -77,6 +77,18 @@
             padding: 5px;
             margin: 5px;
         }
+
+        .tag-button {
+            padding: 5px;
+            background: #E0FFFF;
+            margin: 2px;
+            border-radius: 6px;
+            font-size: 1.2em;
+        }
+        .textfield {
+            margin: 10px;
+            border: 3px solid #ccc;
+        }
     </style>
     
 
@@ -104,7 +116,7 @@
                 const selectedTagButtons = document.querySelectorAll('.selected-tags button');
                 tagIds = Array.from(selectedTagButtons).map(button => button.getAttribute('data-tag-id'));
             }
-        
+            if (tagIds.length < 1) { alert('No Tags Selected') }
             // If action is not provided, default to 'add'
             action = action || 'add';
             console.log('tagIds', tagIds);
@@ -255,10 +267,10 @@
     </script>
 </head>
 <body>
-    <b>Gallery: {{ gallery_name }}</b>
+    <b>Gallery: {{ gallery_name }} <a href="/directories/"> Dir List </a></b>
     <div class="fixed-tags-container">
-        <div class="tags-controls">
-            <input type="text" name="newTags" id="newTags" size="100" placeholder="comma delimited tags">
+        <div class="tags-controls"><a href="/directories/"> Dir List </a>
+            <input type="text" class="textfield" name="newTags" id="newTags" size="100" placeholder="comma delimited tags">
             <button type="button" onclick="addNewTags()">Add</button>
             <button type="button" onclick="performSearch()">Search Files</button>
         </div>
@@ -268,7 +280,7 @@
                 <b>Available Tags</b>
                 <div class="available-tags">
                     {% for tag in tags %}
-                        <button type="button" id="tag-{{ tag.id }}" data-tag-id="{{ tag.id }}" onclick="moveTagToSelected('{{ tag.id }}', '{{ tag.name }}')">{{ tag.name }}</button>
+                        <button class="tag-button" type="button" id="tag-{{ tag.id }}" data-tag-id="{{ tag.id }}" onclick="moveTagToSelected('{{ tag.id }}', '{{ tag.name }}')">{{ tag.name }}</button>
                     {% endfor %}
                 </div>
             </div>
