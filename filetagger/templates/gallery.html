@@ -263,7 +263,22 @@
                 .catch(error => console.error('Error:', error));
         }
         
-        
+        function publishFile(filePath) {
+            fetch('/api/publish-file/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ path: filePath })
+            })
+            .then(response => response.json())
+            .then(data => {
+            
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
     </script>
 </head>
 <body>
@@ -288,7 +303,7 @@
             <div class="selected-tags-container">
                 <b>Selected Tags</b>
                 <div class="selected-tags">
-                    <!-- Tags selected for search will appear here -->
+                    <!-- Tags  -->
                 </div>
             </div>
         </div>

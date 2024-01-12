@@ -4,6 +4,7 @@
         <img src="{% url 'send_image' file.thumbnail %}" alt="Thumbnail">
     </a>
     <button type="button" class="button" onclick="updateTags('{{ file.path }}')">Add Tags</button>
+    <button type="button" class="button" onclick="publishFile('{{ file.path }}')">Publish</button>
     <div class="tags">
         {% for tag in file.tags.all %}
             <button class="tag-button" onclick="removeTag('{{ tag.name }}', '{{ file.path }}')">{{ tag.name }}</button>

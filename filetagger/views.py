@@ -6,7 +6,7 @@ from .models import AccessibleDirectory, Tag, TagGroup, File
 from .forms import DirectoryForm
 from django.http import JsonResponse
 import json
-
+from .utils import create_or_update_json_for_file
 
 
 def directory_list(request):
@@ -56,7 +56,7 @@ def gallery_view(request, dir_id, dir_name):
             file_instance = File.objects.filter(path=file_full_path).first()
             file_tags = file_instance.tags.all() if file_instance else []
             if file_instance:
-                create_or_update_json_for_file(file_instance, gallery_path, dir_name)
+                create_or_update_json_for_file(file_instance)
              
 
             file_info = {
@@ -84,20 +84,3 @@ def send_image(request, filename):
         raise Http404("Image does not exist")
 
 
-def create_or_update_json_for_file(file_instance, gallery_path, dir_name):
-    if not file_instance:
-        return
-
-    file_tags = file_instance.tags.all()
-
-    json_data = {
-        "id": file_instance.id,
-        "name": os.path.basename(file_instance.path),
-        "path": file_instance.path,
-        "tags": [{"id": tag.id, "name": tag.name} for tag in file_tags]
-    }
-
-    # Write JSON data to file
-    json_filename = os.path.join(gallery_path, dir_name, f'images/{os.path.basename(file_instance.path)}.json')
-    with open(json_filename, 'w') as json_file:
-        json.dump(json_data, json_file, indent=4)

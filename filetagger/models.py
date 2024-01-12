@@ -8,6 +8,7 @@ class File(models.Model):
     name = models.CharField(max_length=255)
     path = models.TextField()
     tags = models.ManyToManyField('Tag', related_name='files')
+    published = models.BooleanField(default=False)
 
 
 class Tag(models.Model):

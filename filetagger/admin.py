@@ -6,7 +6,7 @@ from .models import AccessibleDirectory,File, Tag, TagGroup
 
 @admin.register(File)
 class FileAdmin(admin.ModelAdmin):
-    list_display = ('name', 'path', 'display_tags')  
+    list_display = ('name', 'published', 'path', 'display_tags')  
     search_fields = ('name', 'path')
     filter_horizontal = ('tags',)
 
