@@ -1,13 +1,19 @@
-<!-- gallery_item.html -->
-<div class="gallery-item" data-photo="{{ file.path }}">
+
+<div class="gallery-item" data-photo="{{ file.path }}" id="gallery-item-{{ key }}">
     <a href="{% url 'send_image' file.path %}" target="_blank">
         <img src="{% url 'send_image' file.thumbnail %}" alt="Thumbnail">
     </a>
-    <button type="button" class="button" onclick="updateTags('{{ file.path }}')">Add Tags</button>
-    <button type="button" class="button" onclick="publishFile('{{ file.path }}')">Publish</button>
+    <div class="">
+        <button type="button" class="button" onclick="updateTags('{{ file.path }}')">Add Tags</button>
+        
+        <b class="published-label" id="published-label-{{ key }}" style="display: {% if file.published %}inline{% else %}none{% endif %};">Published</b>
+        <button type="button" class="button publish-button" id="publish-button-{{ key }}" onclick="publishFile('{{ file.path }}', '{{ key }}')" style="display: {% if file.published %}none{% else %}inline{% endif %};">Publish</button>
+        
+    </div>
     <div class="tags">
         {% for tag in file.tags.all %}
             <button class="tag-button" onclick="removeTag('{{ tag.name }}', '{{ file.path }}')">{{ tag.name }}</button>
         {% endfor %}
     </div>
+    
 </div>

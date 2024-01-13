@@ -98,8 +98,15 @@ def publish_file(request):
     try:
         data = json.loads(request.body)
         file_path = data.get('path')
+        print("File path received:", file_path)  # Debugging statement
 
-        file = File.objects.get(path=file_path)
+        try:
+            file, created = File.objects.get_or_create(path=file_path)
+
+            #file = File.objects.get(path=file_path)
+        except File.DoesNotExist:
+            raise ValueError(f"No file found with path: {file_path}")
+
         file.published = True
         file.save()
 
@@ -108,7 +115,10 @@ def publish_file(request):
 
         return JsonResponse({"status": "success", "message": "File published successfully"})
     except Exception as e:
+        print("Error:", str(e))  # Print the error for debugging
         return JsonResponse({"status": "error", "message": str(e)}, status=400)
+
+
 
 def update_published_status(file_path, status):
     json_file_path = f'{file_path}.json'

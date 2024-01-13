@@ -45,6 +45,8 @@ def gallery_view(request, dir_id, dir_name):
         files = [name for name in os.listdir(files_path) if name.endswith('.jpg')]
 
         for file in files:
+            file_id = ''
+            published = False
             file_full_path = os.path.join(files_path, file)
             thumbnail_file = file  # assuming thumbnail file has the same name
             thumbnail_path = os.path.join(thumbnails_path, thumbnail_file)
@@ -57,12 +59,16 @@ def gallery_view(request, dir_id, dir_name):
             file_tags = file_instance.tags.all() if file_instance else []
             if file_instance:
                 create_or_update_json_for_file(file_instance)
+                file_id = file_instance.id
+                published = file_instance.published
              
 
             file_info = {
                 'path': file_full_path,
                 'thumbnail': thumbnail_path,
-                'tags': file_tags
+                'tags': file_tags,
+                'published': published,
+                'id': file_id
             }
             file_data.append(file_info)
 

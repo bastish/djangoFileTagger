@@ -263,7 +263,7 @@
                 .catch(error => console.error('Error:', error));
         }
         
-        function publishFile(filePath) {
+        function publishFile(filePath, key) {
             fetch('/api/publish-file/', {
                 method: 'POST',
                 headers: {
@@ -273,12 +273,18 @@
             })
             .then(response => response.json())
             .then(data => {
-            
+                if(data.status === 'success') {
+                    // Toggle visibility of the publish button and published label
+                    document.getElementById('publish-button-' + key).style.display = 'none';
+                    document.getElementById('published-label-' + key).style.display = 'inline';
+                }
             })
             .catch(error => {
                 console.error('Error:', error);
             });
         }
+        
+        
     </script>
 </head>
 <body>
@@ -311,11 +317,12 @@
         
 
     <div class="gallery-container">
-
-         {% for file in files %}
-            {% include 'gallery_item.html' with file=file %}
-        {% endfor %} 
-
+        {% for file in files %}
+            {% with forloop.counter as key %}
+                {% include 'gallery_item.html' with file=file key=key %}
+            {% endwith %}
+        {% endfor %}
+    
     </div>
     
 </body>
