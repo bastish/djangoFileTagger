@@ -15,7 +15,8 @@ def create_or_update_json_for_file(file_instance):
         "tags": [{"id": tag.id, "name": tag.name} for tag in file_tags]
     }
 
-    json_filename = f'{file_instance.path}.json'
+    file_path = f'{file_instance.path}'
+    json_filename = f'{file_path.rsplit(".", 1)[0]}.json'
 
     with open(json_filename, 'w') as json_file:
         json.dump(json_data, json_file, indent=4)

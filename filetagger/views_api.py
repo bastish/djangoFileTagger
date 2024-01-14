@@ -121,7 +121,7 @@ def publish_file(request):
 
 
 def update_published_status(file_path, status):
-    json_file_path = f'{file_path}.json'
+    json_file_path = f'{file_path.rsplit(".", 1)[0]}.json'
     if os.path.exists(json_file_path):
         with open(json_file_path, 'r+') as file:
             data = json.load(file)

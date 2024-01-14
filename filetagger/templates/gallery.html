@@ -158,11 +158,12 @@
                     if (tagsContainer) {
                         // Clear existing tags
                         tagsContainer.innerHTML = '';
-
+        
                         // Add each tag as a button
                         data.tags.forEach(tag => {
                             const tagButton = document.createElement('button');
                             tagButton.textContent = tag.name;
+                            tagButton.className = 'tag-button';
                             tagButton.onclick = () => removeTag(tag.name, photo);
                             tagsContainer.appendChild(tagButton);
                         });
@@ -170,9 +171,10 @@
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
+                        console.error('Error:', error);
             });
         }
+        
 
 
         function selectTagGroupTags(tagGroupIds) {
