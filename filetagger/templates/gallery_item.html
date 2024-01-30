@@ -6,9 +6,17 @@
     <div class="">
         <button type="button" class="button" onclick="updateTags('{{ file.path }}')">Add Tags</button>
         
-        <b class="published-label" id="published-label-{{ key }}" style="display: {% if file.published %}inline{% else %}none{% endif %};">Published</b>
-        <button type="button" class="button publish-button" id="publish-button-{{ key }}" onclick="publishFile('{{ file.path }}', '{{ key }}')" style="display: {% if file.published %}none{% else %}inline{% endif %};">Publish</button>
-        
+        {% comment %} <b class="published-label" id="published-label-{{ key }}" style="display: {% if file.published %}inline{% else %}none{% endif %};">Published</b>
+        <button type="button" class="button publish-button" id="publish-button-{{ key }}" onclick="publishFile('{{ file.path }}', '{{ key }}')" style="display: {% if file.published %}none{% else %}inline{% endif %};">Publish</button> {% endcomment %}
+        <button 
+    type="button" 
+    class="button publish-button" 
+    id="publish-button-{{ key }}" 
+    onclick="publishFile('{{ file.path }}', '{{ key }}')"
+    style="background-color: {% if file.published %}orange{% else %}initial{% endif %};">
+    {% if file.published %}Re-publish{% else %}Publish{% endif %}
+</button>
+
     </div>
     <div class="tags">
         {% for tag in file.tags.all %}

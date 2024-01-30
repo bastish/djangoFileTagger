@@ -95,6 +95,7 @@ def search_by_tags_html(request):
 @csrf_exempt
 @require_http_methods(["POST"])
 def publish_file(request):
+
     try:
         data = json.loads(request.body)
         file_path = data.get('path')
@@ -112,6 +113,8 @@ def publish_file(request):
 
         update_published_status(file_path, True)
         add_to_published_list(file_path)
+        
+
 
         return JsonResponse({"status": "success", "message": "File published successfully"})
     except Exception as e:
@@ -131,9 +134,15 @@ def update_published_status(file_path, status):
             file.truncate()
 
 def add_to_published_list(file_path):
+
+    script_dir = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.dirname(script_dir)
     # Remove the .jpg extension and append .json
     json_file_path = f'{file_path.rsplit(".", 1)[0]}.json'
-    published_list_path = os.path.join(os.path.dirname(file_path), 'published.json')
+    #published_list_path = os.path.join(os.path.dirname(file_path), 'published.json')
+    published_list_path = os.path.join(project_root, 'published.json')
+
+
 
     # Check if the file is already in the list
     if not is_path_in_published_list(json_file_path, published_list_path):

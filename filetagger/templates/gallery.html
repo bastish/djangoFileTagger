@@ -53,10 +53,12 @@
     
 
         .gallery-container {
-            padding-top: 200px; /* Adjust the padding to accommodate the fixed container */
+            margin-top: 300px; /* Adjust the padding to accommodate the fixed container */
+            padding-top: 20px;
             display: flex;
             flex-wrap: wrap;
             gap: 10px;
+            border-top: 2px solid #000;
         }
     
         .gallery-item {
@@ -317,14 +319,13 @@
         </div>
     </div>
         
-
+    <hr>
     <div class="gallery-container">
         {% for file in files %}
             {% with forloop.counter as key %}
                 {% include 'gallery_item.html' with file=file key=key %}
             {% endwith %}
         {% endfor %}
-    
     </div>
     
 </body>
