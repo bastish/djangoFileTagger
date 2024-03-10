@@ -45,10 +45,10 @@
         }
     
         .available-tags-container {
-            width: 50%;
+            width: 80%;
         }
         .selected-tags-container {
-            width: 50%;
+            width: 20%;
         }
     
 
@@ -81,11 +81,11 @@
         }
 
         .tag-button {
-            padding: 5px;
+            padding: 3px;
             background: #E0FFFF;
             margin: 2px;
             border-radius: 6px;
-            font-size: 1.2em;
+            font-size: 1em;
         }
         .textfield {
             margin: 10px;
@@ -240,8 +240,9 @@
         
             images.forEach(image => {
                 // Extract the relative path from the full path
-                const relativePath = image.thumbnail.replace('/Volumes/Toshiba 1TB 2022.12.06/flickrBrowser/', '');
-        
+                let relativePath = image.thumbnail.replace('/Volumes/Toshiba 1TB 2022.12.06/flickrBrowser/', 'Toshiba1TB20221206');
+                relativePath = image.thumbnail.replace('/Volumes/Toshiba1TB20221206/flickrBrowser/', '');
+                
                 // Construct the URL for the send_image view
                 const imageUrl = `/image/${encodeURIComponent(relativePath)}/`;
         

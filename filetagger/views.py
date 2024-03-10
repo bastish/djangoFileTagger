@@ -33,7 +33,7 @@ def directory_detail(request, dir_id):
 def gallery_view(request, dir_id, dir_name):
     directory = get_object_or_404(AccessibleDirectory, id=dir_id)
     gallery_path = directory.path
-    tags = Tag.objects.all()
+    tags = Tag.objects.order_by('name') 
     tag_groups = TagGroup.objects.all()
 
     thumbnails_path = os.path.join(gallery_path, dir_name, 'images/thumbnails')
@@ -56,7 +56,9 @@ def gallery_view(request, dir_id, dir_name):
 
             # Check if there's a corresponding File instance in the database
             file_instance = File.objects.filter(path=file_full_path).first()
-            file_tags = file_instance.tags.all() if file_instance else []
+            #file_tags = file_instance.tags.all() if file_instance else []
+            file_tags = file_instance.tags.order_by('name') if file_instance else []
+
             if file_instance:
                 create_or_update_json_for_file(file_instance)
                 file_id = file_instance.id
@@ -82,7 +84,8 @@ def gallery_view(request, dir_id, dir_name):
 
 
 def send_image(request, filename):
-    image_path = os.path.join('/Volumes/Toshiba 1TB 2022.12.06/flickrBrowser/', filename)
+    #image_path = os.path.join('/Volumes/Toshiba 1TB 2022.12.06/flickrBrowser/', filename)
+    image_path = os.path.join('/Volumes/Toshiba1TB20221206/flickrBrowser/', filename)
     
     if os.path.exists(image_path) and os.path.isfile(image_path):
         return FileResponse(open(image_path, 'rb'))
