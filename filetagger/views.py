@@ -8,6 +8,7 @@ from django.http import JsonResponse
 import json
 from .utils import create_or_update_json_for_file
 
+#/Users/kevincameron/Documents
 
 def directory_list(request):
     if request.method == 'POST':
@@ -38,7 +39,7 @@ def gallery_view(request, dir_id, dir_name):
 
     thumbnails_path = os.path.join(gallery_path, dir_name, 'images/thumbnails')
     files_path = os.path.join(gallery_path, dir_name, 'images')
-
+    print(f'File Path {files_path}')
     file_data = []
 
     if os.path.exists(files_path):
@@ -87,6 +88,7 @@ def send_image(request, filename):
     #image_path = os.path.join('/Volumes/Toshiba 1TB 2022.12.06/flickrBrowser/', filename)
     image_path = os.path.join('/Volumes/Toshiba1TB20221206/flickrBrowser/', filename)
     
+
     if os.path.exists(image_path) and os.path.isfile(image_path):
         return FileResponse(open(image_path, 'rb'))
     else:
