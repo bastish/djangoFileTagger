@@ -23,10 +23,12 @@ def directory_list(request):
 
 def directory_detail(request, dir_id):
     directory = get_object_or_404(AccessibleDirectory, id=dir_id)
-
+    print(directory)
     if os.path.isdir(directory.path):
         contents = [{'name': item, 'is_dir': os.path.isdir(os.path.join(directory.path, item))}
                     for item in os.listdir(directory.path)]
+        
+        print(f'contents {contents}')
     else:
         contents = [{'name': 'Invalid directory', 'is_dir': False}]
     return render(request, 'directory_detail.html', {'directory': directory, 'contents': contents})
@@ -43,7 +45,7 @@ def gallery_view(request, dir_id, dir_name):
     file_data = []
 
     if os.path.exists(files_path):
-        files = [name for name in os.listdir(files_path) if name.endswith('.jpg')]
+        files = [name for name in os.listdir(files_path) if name.endswith(('.jpg', '.png'))]
 
         for file in files:
             file_id = ''
